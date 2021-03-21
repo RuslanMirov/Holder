@@ -6,6 +6,7 @@ import { duration } from './helpers/duration'
 import latestTime from './helpers/latestTime'
 import advanceTimeAndBlock from './helpers/advanceTimeAndBlock'
 
+const timeMachine = require('ganache-time-traveler')
 const BigNumber = BN
 
 require('chai')
@@ -42,6 +43,27 @@ contract('Holder', function([userOne, userTwo, userThree]) {
     })
 
     it('Holder hold ETH', async function() {
+      assert.equal(await web3.eth.getBalance(holder.address), toWei(String(1)))
+    })
+  })
+
+  describe('Withdraw ETH', function() {
+    it('Owner can not withdarw ahead of time', async function() {
+      await holder.withdrawETH().should.be.rejectedWith(EVMRevert)
+      assert.equal(await web3.eth.getBalance(holder.address), toWei(String(1)))
+    })
+
+    it('Owner can not withdarw after finish time', async function() {
+      const ownerBalanceBefore = await web3.eth.getBalance(userOne)
+      await timeMachine.advanceTimeAndBlock(duration.days(366))
+      await holder.withdrawETH()
+      assert.equal(await web3.eth.getBalance(holder.address), 0)
+      assert.isTrue(await web3.eth.getBalance(userOne) > ownerBalanceBefore)
+    })
+
+    it('Not owner can not withdarw after finish time', async function() {
+      await timeMachine.advanceTimeAndBlock(duration.days(366))
+      await holder.withdrawETH({ from:userTwo }).should.be.rejectedWith(EVMRevert)
       assert.equal(await web3.eth.getBalance(holder.address), toWei(String(1)))
     })
   })
