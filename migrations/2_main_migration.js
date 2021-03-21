@@ -1,7 +1,7 @@
 /* globals artifacts */
-const MoreBTC = artifacts.require('./MoreBTC.sol')
+const Holder = artifacts.require('./Holder.sol')
 
 
 module.exports = async (deployer, network, accounts) => {
-    await deployer.deploy(MoreBTC)
+    // await deployer.deploy(Holder)
 }

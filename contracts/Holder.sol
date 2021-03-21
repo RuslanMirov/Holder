@@ -9,15 +9,15 @@ contract Holder is Ownable {
   bool public isPassUsed;
   uint256 public holdTime;
 
-  constructor(bytes32 calldata _password) public {
+  constructor(bytes32 _password) public {
     password = _password;
-    holdTime = now + 1 years;
+    holdTime = now + 365 days;
   }
 
   function withdrawETH() external onlyOwner {
     require(now >= holdTime, "EARLY");
     uint256 amount = address(this).balance;
-    (owner()).transfer(amount);
+    payable(owner()).transfer(amount);
   }
 
   function withdrawERC20(address _token) external onlyOwner {
@@ -29,7 +29,7 @@ contract Holder is Ownable {
   function emergencyWithdrawETH(string calldata _password) external onlyOwner {
      require(keccak256(abi.encodePacked(_password)) == password, "WRONG PASS");
      uint256 amount = address(this).balance;
-     (owner()).transfer(amount);
+     payable(owner()).transfer(amount);
      isPassUsed = true;
   }
 
@@ -40,7 +40,7 @@ contract Holder is Ownable {
      isPassUsed = true;
   }
 
-  function setNewPassword(bytes32 calldata _password) external onlyOwner {
+  function setNewPassword(bytes32 _password) external onlyOwner {
      require(isPassUsed, "OLD PASS MUST BE USED");
      password = _password;
      isPassUsed = false;
@@ -49,10 +49,10 @@ contract Holder is Ownable {
   // not allow increase more than 1 year per one transaction
   // for case if user pass too big number in param
   function increaseHoldTime(uint256 _addTime) external onlyOwner {
-     require(_addTime <= 1 years, "CAN NOT SET MORE THAN 1 YEAR");
+     require(_addTime <= 365 days, "CAN NOT SET MORE THAN 1 YEAR");
      holdTime = holdTime + _addTime;
   }
 
   // fallback payable function to receive ether
-  fallback() external payable {}
+  receive() external payable{}
 }
