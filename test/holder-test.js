@@ -221,12 +221,12 @@ contract('Holder', function([userOne, userTwo, userThree]) {
   })
 
   describe('increaseHoldTime permissions', function() {
-    it('Now owner can not increaseHoldTime', async function() {
+    it('Not owner can not increaseHoldTime', async function() {
       await holder.increaseHoldTime(duration.days(12), { from:userTwo })
       .should.be.rejectedWith(EVMRevert)
     })
 
-    it('Owner can not set more than 365 days in increaseHoldTime', async function() {
+    it('Owner can NOT set more than 365 days in increaseHoldTime', async function() {
       await holder.increaseHoldTime(duration.days(366))
       .should.be.rejectedWith(EVMRevert)
     })
