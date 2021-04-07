@@ -1,4 +1,3 @@
-// NOT TESTED
 pragma solidity ^0.6.12;
 
 import "./zeppelin-solidity/contracts/access/Ownable.sol";
@@ -51,6 +50,10 @@ contract Holder is Ownable {
   function increaseHoldTime(uint256 _addTime) external onlyOwner {
      require(_addTime <= 365 days, "CAN NOT SET MORE THAN 1 YEAR");
      holdTime = holdTime + _addTime;
+  }
+
+  function renounceOwnership() public override onlyOwner {
+     revert("NOT ALLOW LEAVE CONTRACT");
   }
 
   // fallback payable function to receive ether
