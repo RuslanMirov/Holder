@@ -233,14 +233,25 @@ contract('Holder', function([userOne, userTwo, userThree]) {
       .should.be.rejectedWith(EVMRevert)
     })
 
-    it('Owner can add 365 days in increaseHoldTime', async function() {
+    it('Owner can add 365 days in increaseHoldTime and now withdraw require more time', async function() {
       const holdTimeBefore = await holder.holdTime()
+      // 2 years in total now 
       await holder.increaseHoldTime(duration.days(365))
 
       assert.equal(
         Number(holdTimeBefore) + Number(duration.days(365)),
         Number(await holder.holdTime())
       )
+
+      // increase 1 year fail
+      await timeMachine.advanceTimeAndBlock(duration.days(366))
+      await holder.withdrawERC20(token.address).should.be.rejectedWith(EVMRevert)
+      assert.notEqual(await token.balanceOf(holder.address), 0)
+
+      // increase 2 years in total, should be fullfiled
+      await timeMachine.advanceTimeAndBlock(duration.days(366))
+      await holder.withdrawERC20(token.address)
+      assert.equal(await token.balanceOf(holder.address), 0)
     })
   })
   // END
