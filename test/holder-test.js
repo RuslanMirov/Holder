@@ -145,7 +145,7 @@ contract('Holder', function([userOne, userTwo, userThree]) {
 
       await holder.setNewPassword(NEW_PASSWORD, { from:userTwo })
       .should.be.rejectedWith(EVMRevert)
-      assert.equal(await holder.isPassUsed(), false)
+      assert.equal(await holder.isPassUsed(), true)
     })
 
     it('Owner can not set new password if old not used', async function() {
